@@ -7,6 +7,7 @@ import { HomeComponentModule } from './components/home/home.component-module';
 import { CategoryComponentModule } from './components/category/category.component-module';
 import { StoreComponentModule } from './components/store/store.component-module';
 import { CategoriesServiceModule } from './services/categories.service-module';
+import { StoresServiceModule } from './services/stores.service-module';
 
 const routes: Routes = [
   {
@@ -30,6 +31,7 @@ const routes: Routes = [
     CategoryComponentModule,
     StoreComponentModule,
     CategoriesServiceModule,
+    StoresServiceModule,
   ],
   exports: [RouterModule],
 })
