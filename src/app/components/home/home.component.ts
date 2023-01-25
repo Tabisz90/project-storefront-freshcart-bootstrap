@@ -3,7 +3,7 @@ import {
   Component,
   ViewEncapsulation,
 } from '@angular/core';
-import { Observable, map, shareReplay, of } from 'rxjs';
+import { Observable, map, of } from 'rxjs';
 import { CategoryQueryModel } from '../../query-models/category.query-model';
 import { CategoriesService } from '../../services/categories.service';
 import { StoresService } from '../../services/stores.service';
@@ -24,8 +24,7 @@ export class HomeComponent {
           name: category.name,
           link: `categories/${category.id}`,
         }))
-      ),
-      shareReplay(1)
+      )
     );
   readonly stores$: Observable<StoreQueryModel[]> = this._storesService
     .getAll()
