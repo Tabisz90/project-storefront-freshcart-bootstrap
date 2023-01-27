@@ -1,0 +1,31 @@
+<div class="container mb-13" *ngIf="stores$ | async as stores">
+  <h3 class="mb-5">Stores</h3>
+  <div class="d-flex text-inherit">
+    We have vendors
+    <p class="text-primary mx-1">{{ stores.length }}</p>
+    now
+  </div>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 g-4">
+    <div *ngFor="let item of stores" class="col">
+      <div class="card flex-row p-8 card-product">
+        <div>
+          <img
+            [src]="item.logoUrl"
+            [alt]="item.name"
+            class="rounded-circle icon-shape icon-xl"
+          />
+        </div>
+        <div class="ms-6">
+          <h5 class="mb-1">
+            <a [routerLink]="item.link" class="text-inherit">{{ item.name }}</a>
+          </h5>
+          <div>
+            <div class="badge text-bg-light border">
+              {{ item.distanceInKilometers | number : "1.0-1" }} km
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
