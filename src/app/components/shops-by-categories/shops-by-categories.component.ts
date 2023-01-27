@@ -21,7 +21,7 @@ export class ShopsByCategoriesComponent {
         categories.map((category) => ({
           name: category.name,
           link: `categories/${category.id}`,
-          imageUrl: category.imageUrl,
+          imageUrl: category.imageUrl.slice(1),
         }))
       )
     );

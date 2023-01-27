@@ -29,9 +29,8 @@ export class FooterComponent implements OnInit {
       )
     );
 
-  readonly stores$: Observable<StoreQueryModel[]> = this._storesStorage
-    .select()
-    .pipe(
+  readonly stores$: Observable<Pick<StoreQueryModel, 'name' | 'link'>[]> =
+    this._storesStorage.select().pipe(
       map((stores) =>
         stores.map((store) => ({
           name: store.name,
