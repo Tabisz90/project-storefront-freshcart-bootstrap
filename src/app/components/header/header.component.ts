@@ -1,14 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
   ViewEncapsulation,
 } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { CategoryQueryModel } from '../../query-models/category.query-model';
 import { InMemoryCategoriesStorage } from '../../storages/categories/in-memory-categories.storage';
-import { CategoriesService } from '../../services/categories.service';
 import { IsVisibleQueryModel } from '../../query-models/is-visible.query-model';
 
 @Component({
@@ -17,7 +15,7 @@ import { IsVisibleQueryModel } from '../../query-models/is-visible.query-model';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
   readonly categories$: Observable<CategoryQueryModel[]> =
     this._categoriesStorage.select().pipe(
       map((categories) =>
@@ -32,20 +30,7 @@ export class HeaderComponent implements OnInit {
   public isNavbarVisible$: Observable<IsVisibleQueryModel> =
     this._isNavbarVisibleSubject.asObservable();
 
-  constructor(
-    private _categoriesStorage: InMemoryCategoriesStorage,
-    private _categoriesService: CategoriesService
-  ) {}
-
-  ngOnInit() {
-    this._categoriesService
-      .getAll()
-      .pipe(
-        switchMap((categories) => this._categoriesStorage.set(categories)),
-        take(1)
-      )
-      .subscribe();
-  }
+  constructor(private _categoriesStorage: InMemoryCategoriesStorage) {}
 
   toggleNavbar(value: boolean) {
     this._isNavbarVisibleSubject.next({ isNavbarVisible: !value });
