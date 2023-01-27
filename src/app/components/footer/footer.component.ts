@@ -19,7 +19,7 @@ import { InMemoryStoresStorage } from '../../storages/stores/in-memory-stores.st
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FooterComponent implements OnInit {
-  readonly categories$: Observable<CategoryQueryModel[]> =
+  readonly categories$: Observable<Omit<CategoryQueryModel, 'imageUrl'>[]> =
     this._categoriesStorage.select().pipe(
       map((categories) =>
         categories.map((category) => ({

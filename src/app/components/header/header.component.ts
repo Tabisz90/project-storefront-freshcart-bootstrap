@@ -16,7 +16,7 @@ import { IsVisibleQueryModel } from '../../query-models/is-visible.query-model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
-  readonly categories$: Observable<CategoryQueryModel[]> =
+  readonly categories$: Observable<Omit<CategoryQueryModel, 'imageUrl'>[]> =
     this._categoriesStorage.select().pipe(
       map((categories) =>
         categories.map((category) => ({

@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { HomeComponent } from './home.component';
+import { ShopsByCategoriesComponentModule } from '../shops-by-categories/shops-by-categories.component-module';
 
 @NgModule({
-  imports: [CommonModule],
+  imports: [ShopsByCategoriesComponentModule],
   declarations: [HomeComponent],
   providers: [],
   exports: [HomeComponent],
