@@ -8,7 +8,8 @@ import { CategoryComponentModule } from './components/category/category.componen
 import { StoreComponentModule } from './components/store/store.component-module';
 import { CategoriesServiceModule } from './services/categories.service-module';
 import { StoresServiceModule } from './services/stores.service-module';
-
+import { InMemoryCategoriesStorageModule } from './storages/categories/in-memory-categories.storage-module';
+import { InMemoryStoresStorageModule } from './storages/stores/in-memory-stores.storage-module';
 const routes: Routes = [
   {
     path: '',
@@ -32,6 +33,8 @@ const routes: Routes = [
     StoreComponentModule,
     CategoriesServiceModule,
     StoresServiceModule,
+    InMemoryCategoriesStorageModule,
+    InMemoryStoresStorageModule,
   ],
   exports: [RouterModule],
 })
