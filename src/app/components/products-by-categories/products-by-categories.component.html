@@ -1,0 +1,39 @@
+<h3 class="mb-8">Fruits & Vegetables</h3>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 row-cols-lg-5 mb-13">
+  <div *ngFor="let item of fruitsAndVegetables$ | async" class="col">
+    <a class="text-decoration-none text-inherit"
+      ><!-- card -->
+      <div class="card card-product">
+        <div class="card-body text-center py-8">
+          <!-- img --><img
+            [src]="item.imageUrl"
+            [alt]="item.name"
+            class="mb-3 img-fluid"
+          /><!-- text -->
+          <div class="text-truncate">{{ item.name }}</div>
+          <div class="text-truncate">{{ item.price | currency }}</div>
+        </div>
+      </div></a
+    >
+  </div>
+</div>
+
+<h3 class="mb-8">Snack & Munchies</h3>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 row-cols-lg-5 mb-13">
+  <div *ngFor="let item of snacksAndMunchies$ | async" class="col">
+    <a class="text-decoration-none text-inherit"
+      ><!-- card -->
+      <div class="card card-product">
+        <div class="card-body text-center py-8">
+          <!-- img --><img
+            [src]="item.imageUrl"
+            [alt]="item.name"
+            class="mb-3 img-fluid"
+          /><!-- text -->
+          <div class="text-truncate">{{ item.name }}</div>
+          <div class="text-truncate">{{ item.price | currency }}</div>
+        </div>
+      </div></a
+    >
+  </div>
+</div>

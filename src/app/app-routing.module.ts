@@ -10,6 +10,7 @@ import { CategoriesServiceModule } from './services/categories.service-module';
 import { StoresServiceModule } from './services/stores.service-module';
 import { InMemoryCategoriesStorageModule } from './storages/categories/in-memory-categories.storage-module';
 import { InMemoryStoresStorageModule } from './storages/stores/in-memory-stores.storage-module';
+import { FreshProductsServiceModule } from './services/fresh-products.service-module';
 const routes: Routes = [
   {
     path: '',
@@ -33,6 +34,7 @@ const routes: Routes = [
     StoreComponentModule,
     CategoriesServiceModule,
     StoresServiceModule,
+    FreshProductsServiceModule,
     InMemoryCategoriesStorageModule,
     InMemoryStoresStorageModule,
   ],

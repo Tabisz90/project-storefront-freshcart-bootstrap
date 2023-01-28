@@ -1,4 +1,4 @@
-<div class="container mb-13" *ngIf="stores$ | async as stores">
+<ng-container *ngIf="stores$ | async as stores">
   <h3 class="mb-5">Stores</h3>
   <div class="d-flex text-inherit">
     We have vendors
@@ -28,4 +28,4 @@
       </div>
     </div>
   </div>
-</div>
+</ng-container>
