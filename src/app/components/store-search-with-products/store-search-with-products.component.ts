@@ -44,7 +44,7 @@ export class StoreSearchWithProductsComponent {
         const store = stores.find((store) => store.id === storeId);
         return {
           name: store?.name || '',
-          logoUrl: store?.logoUrl || '',
+          logoUrl: store?.logoUrl.slice(1) || '',
           distanceInKilometers: (store?.distanceInMeters || 1) * 0.001,
         };
       })
