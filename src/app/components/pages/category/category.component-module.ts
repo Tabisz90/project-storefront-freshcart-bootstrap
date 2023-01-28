@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CategoryComponent } from './category.component';
+import { CategoriesDetailsComponentModule } from '../../categories-details/categories-details.component-module';
 
 @NgModule({
-  imports: [],
+  imports: [CategoriesDetailsComponentModule],
   declarations: [CategoryComponent],
   providers: [],
-  exports: [CategoryComponent]
+  exports: [CategoryComponent],
 })
-export class CategoryComponentModule {
-}
+export class CategoryComponentModule {}
