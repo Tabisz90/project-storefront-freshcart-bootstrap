@@ -21,7 +21,7 @@ export class StoresComponent {
       map((stores) =>
         stores.map((store) => ({
           name: store.name,
-          link: `categories/${store.id}`,
+          link: `stores/${store.id}`,
           logoUrl: store.logoUrl.slice(1),
           distanceInKilometers: store.distanceInMeters * 0.001,
         }))
