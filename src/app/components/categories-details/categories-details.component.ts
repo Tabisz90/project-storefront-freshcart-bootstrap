@@ -125,56 +125,18 @@ export class CategoriesDetailsComponent {
     freshProductsdetails: FreshProductsDetailedQueryModel[],
     sortOption: string
   ): FreshProductsDetailedQueryModel[] {
-    if (sortOption === 'featureValueDesc') {
-      return this._sortByFeatureValueDesc(freshProductsdetails);
-    }
-    if (sortOption === 'priceAsc' || sortOption === 'priceDesc') {
-      return this._sortByPrice(freshProductsdetails, sortOption);
-    }
-    if (sortOption === 'ratingDesc') {
-      return this._sortByRatingValueDesc(freshProductsdetails);
-    }
-    return freshProductsdetails;
-  }
-
-  private _sortByFeatureValueDesc(
-    freshProductsdetails: FreshProductsDetailedQueryModel[]
-  ): FreshProductsDetailedQueryModel[] {
     return freshProductsdetails.sort((fpA, fpB) => {
-      if (fpA.featureValue > fpB.featureValue) {
-        return -1;
+      if (sortOption === 'featureValueDesc') {
+        return fpA.featureValue > fpB.featureValue ? -1 : 1;
       }
-      if (fpA.featureValue < fpB.featureValue) {
-        return 1;
+      if (sortOption === 'priceAsc') {
+        return fpA.price < fpB.price ? -1 : 1;
       }
-      return 0;
-    });
-  }
-
-  private _sortByPrice(
-    freshProductsdetails: FreshProductsDetailedQueryModel[],
-    sortOption: string
-  ): FreshProductsDetailedQueryModel[] {
-    return freshProductsdetails.sort((fpA, fpB) => {
-      if (fpA.price > fpB.price) {
-        return sortOption === 'priceAsc' ? 1 : -1;
+      if (sortOption === 'priceDesc') {
+        return fpA.price < fpB.price ? 1 : -1;
       }
-      if (fpA.price < fpB.price) {
-        return sortOption === 'priceAsc' ? -1 : 1;
-      }
-      return 0;
-    });
-  }
-
-  private _sortByRatingValueDesc(
-    freshProductsdetails: FreshProductsDetailedQueryModel[]
-  ): FreshProductsDetailedQueryModel[] {
-    return freshProductsdetails.sort((fpA, fpB) => {
-      if (fpA.rating.value > fpB.rating.value) {
-        return -1;
-      }
-      if (fpA.rating.value < fpB.rating.value) {
-        return 1;
+      if (sortOption === 'ratingDesc') {
+        return fpA.rating.value > fpB.rating.value ? -1 : 1;
       }
       return 0;
     });
