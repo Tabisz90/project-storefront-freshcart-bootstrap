@@ -1,30 +1,84 @@
-<div class="row row-cols-1 row-cols-md-2 g-12">
-  <div class="col-12 col-md-3">
-    <h4 class="mb-3">Categories</h4>
-    <ul class="nav nav-category">
-      <li
-        *ngFor="let item of categoriesNames$ | async"
-        class="nav-item border-bottom w-100 collapsed"
-      >
-        <a class="nav-link"
-          >{{ item }}
-          <img
-            src="assets/libs/feather-icons/dist/icons/chevron-right.svg"
-            width="16"
-            height="16"
-            alt="arrow-right"
-        /></a>
-      </li>
-    </ul>
-  </div>
-  <div class="col-12 col-md-9">
-    <div
-      class="card bg-light w-100"
-      *ngIf="currentPageCategoryName$ | async as categoryName"
-    >
-      <div class="card-body p-9">
-        <h2 class="mb-0">{{ categoryName }}</h2>
-      </div>
+<ng-container *ngIf="currentPageCategoryName$ | async as categoryName">
+  <div class="row row-cols-1 row-cols-md-2 g-12">
+    <div class="col-12 col-md-3">
+      <h4 class="mb-3">Categories</h4>
+      <ul class="nav nav-category">
+        <li
+          *ngFor="let item of categoriesNames$ | async"
+          class="nav-item border-bottom w-100 collapsed"
+        >
+          <a class="nav-link"
+            >{{ item }}
+            <img
+              src="assets/libs/feather-icons/dist/icons/chevron-right.svg"
+              width="16"
+              height="16"
+              alt="arrow-right"
+          /></a>
+        </li>
+      </ul>
     </div>
+    <section class="col-12 col-md-9">
+      <div class="card bg-light w-100">
+        <div class="card-body p-9">
+          <h2 class="mb-0">{{ categoryName }}</h2>
+        </div>
+      </div>
+      <ng-container *ngIf="freshProducts$ | async as freshProducts">
+        <p class="mt-10">{{ freshProducts.length }} Products found</p>
+        <div class="row row-cols-1">
+          <div class="col" *ngFor="let freshProduct of freshProducts">
+            <div class="card card-product">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-4">
+                    <img
+                      [src]="freshProduct.imageUrl"
+                      [alt]="'image'"
+                      class="img-fluid w-100"
+                    />
+                  </div>
+                  <div class="col-8">
+                    <div
+                      class="d-flex flex-column justify-content-center h-100"
+                    >
+                      <div>
+                        <p class="text-muted m-0">{{ categoryName }}</p>
+                      </div>
+                      <div class="mb-1">
+                        <p class="m-0 text-truncate fs-5 text-black">
+                          {{ freshProduct.name }}
+                        </p>
+                      </div>
+                      <div class="d-flex align-items-center">
+                        <small class="text-warning">
+                          <i
+                            *ngFor="let val of freshProduct.rating.starsValues"
+                            class="bi"
+                            [ngClass]="{
+                              'bi-star-fill': val === 1,
+                              'bi-star': val === 0,
+                              'bi-star-half': val === 0.5
+                            }"
+                          ></i>
+                        </small>
+                        <p class="p-0 m-0">
+                          {{ freshProduct.rating.value }}({{
+                            freshProduct.rating.ratingCount
+                          }})
+                        </p>
+                      </div>
+                      <div class="mt-5 text-black fs-5">
+                        {{ freshProduct.price | currency }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </section>
   </div>
-</div>
+</ng-container>
