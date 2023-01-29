@@ -3,8 +3,16 @@ import {
   Component,
   ViewEncapsulation,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Observable, combineLatest, shareReplay, of, startWith } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import {
+  Observable,
+  combineLatest,
+  shareReplay,
+  of,
+  startWith,
+  take,
+  tap,
+} from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CategoryModel } from '../../models/category.model';
 import { FreshProductsModel } from '../../models/fresh-products.model';
@@ -31,6 +39,18 @@ export class CategoriesDetailsComponent {
     { name: 'Price: High to Low', value: 'priceDesc' },
     { name: 'Avg Rating', value: 'ratingDesc' },
   ]);
+  readonly pageSizes$: Observable<number[]> = of([5, 10, 15]);
+  readonly pagination$: Observable<{ pageNumber: number; pageSize: number }> =
+    this._activatedRoute.queryParams.pipe(
+      map((params) => {
+        return {
+          pageNumber: params['pageNumber'] ? +params['pageNumber'] : 1,
+          pageSize: params['pageSize'] ? +params['pageSize'] : 5,
+        };
+      }),
+      startWith({ pageNumber: 1, pageSize: 5 }),
+      shareReplay(1)
+    );
   readonly categoryId$: Observable<string> = this._activatedRoute.params.pipe(
     map((params) => params['categoryId'])
   );
@@ -61,14 +81,74 @@ export class CategoriesDetailsComponent {
           categoryId
         );
         return this._sort(freshProductsdetails, sortOption);
-      })
+      }),
+      shareReplay(1)
     );
+
+  readonly freshProductsWithPagination$: Observable<
+    FreshProductsDetailedQueryModel[]
+  > = combineLatest([this.freshProducts$, this.pagination$]).pipe(
+    map(([freshProducts, pagination]) => {
+      return freshProducts.slice(
+        pagination.pageNumber * pagination.pageSize - pagination.pageSize,
+        pagination.pageNumber * pagination.pageSize
+      );
+    }),
+    shareReplay(1)
+  );
+
+  readonly pageNumbers$: Observable<number[]> = combineLatest([
+    this.pagination$,
+    this.freshProducts$,
+  ]).pipe(
+    map(([pagination, freshProducts]) => {
+      return freshProducts
+        .slice(0, Math.ceil(freshProducts.length / pagination.pageSize))
+        .map((freshProduct, i) => i + 1);
+    })
+  );
 
   constructor(
     private _categoriesStorage: InMemoryCategoriesStorage,
     private _activatedRoute: ActivatedRoute,
-    private _freshProductsService: FreshProductsService
+    private _freshProductsService: FreshProductsService,
+    private _router: Router
   ) {}
+
+  onPageSizeChanged(pageSize: number): void {
+    combineLatest([this.pagination$, this.freshProducts$])
+      .pipe(
+        tap(([pagination, freshProducts]) =>
+          this._router.navigate([], {
+            queryParams: {
+              pageNumber: Math.min(
+                Math.ceil(freshProducts.length / pageSize),
+                pagination.pageNumber
+              ),
+              pageSize,
+            },
+          })
+        ),
+        take(1)
+      )
+      .subscribe();
+  }
+
+  onPageNumberChanged(pageNumber: number): void {
+    this.pagination$
+      .pipe(
+        tap((pagination) =>
+          this._router.navigate([], {
+            queryParams: {
+              pageNumber: pageNumber,
+              pageSize: pagination.pageSize,
+            },
+          })
+        ),
+        take(1)
+      )
+      .subscribe();
+  }
 
   private _findCategoryNameById(
     categoryId: string,
