@@ -38,7 +38,8 @@ export class CategoriesDetailsComponent {
     .pipe(
       map((stores) =>
         stores.map((store) => ({ id: store.id, name: store.name }))
-      )
+      ),
+      shareReplay(1)
     );
 
   readonly sortForm: FormControl = new FormControl('featureValueDesc');
@@ -82,6 +83,22 @@ export class CategoriesDetailsComponent {
     storeIds: new FormControl(),
   });
 
+  readonly storeSearchForm: FormControl = new FormControl();
+  readonly storeSearch$ = combineLatest([
+    this.stores$,
+    this.storeSearchForm.valueChanges,
+  ]).pipe(
+    startWith([]),
+    map(([stores, storeName]) => {
+      return stores?.reduce((acc, c) => {
+        if (c.name.toLowerCase().includes(storeName.toLowerCase().trim())) {
+          return [...acc, c.id];
+        }
+        return [...acc];
+      }, [] as string[]);
+    })
+  );
+
   readonly filters$: Observable<any> = this.filtersForm.valueChanges.pipe(
     startWith({
       priceFrom: 0,
@@ -106,34 +123,47 @@ export class CategoriesDetailsComponent {
       this.categoryId$,
       this.sort$,
       this.filters$,
+      this.storeSearch$,
     ]).pipe(
-      map(([freshProducts, categoryId, sortOption, filters]) => {
-        const freshProductsdetails = this._filterByCategoryIdAndMapToFPQuery(
-          freshProducts,
-          categoryId
-        ).filter((freshProduct) => {
-          let decider: boolean = true;
-          if (filters.priceFrom) {
-            decider = decider && freshProduct.price >= filters.priceFrom;
-          }
-          if (filters.priceTo) {
-            decider = decider && freshProduct.price <= filters.priceTo;
-          }
-          if (filters.minRatingValue) {
-            decider =
-              decider && freshProduct.rating.value >= filters.minRatingValue;
-          }
-          if (filters.storeIds.length > 0 && freshProduct.storeIds.length > 0) {
-            decider =
-              decider &&
-              filters.storeIds.some((id: string) =>
-                freshProduct.storeIds.some((storeId) => storeId === id)
-              );
-          }
-          return decider;
-        });
-        return this._sort(freshProductsdetails, sortOption);
-      }),
+      map(
+        ([freshProducts, categoryId, sortOption, filters, storeSearchIds]) => {
+          const freshProductsdetails = this._filterByCategoryIdAndMapToFPQuery(
+            freshProducts,
+            categoryId
+          ).filter((freshProduct) => {
+            let decider: boolean = true;
+            if (filters.priceFrom) {
+              decider = decider && freshProduct.price >= filters.priceFrom;
+            }
+            if (filters.priceTo) {
+              decider = decider && freshProduct.price <= filters.priceTo;
+            }
+            if (filters.minRatingValue) {
+              decider =
+                decider && freshProduct.rating.value >= filters.minRatingValue;
+            }
+            if (
+              filters.storeIds.length > 0 &&
+              freshProduct.storeIds.length > 0
+            ) {
+              decider =
+                decider &&
+                filters.storeIds.some((id: string) =>
+                  freshProduct.storeIds.some((storeId) => storeId === id)
+                );
+            }
+            if (storeSearchIds?.length > 0) {
+              decider =
+                decider &&
+                storeSearchIds.some((id: string) =>
+                  freshProduct.storeIds.some((storeId) => storeId === id)
+                );
+            }
+            return decider;
+          });
+          return this._sort(freshProductsdetails, sortOption);
+        }
+      ),
       shareReplay(1)
     );
 
