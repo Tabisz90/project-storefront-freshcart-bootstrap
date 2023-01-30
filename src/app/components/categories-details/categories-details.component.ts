@@ -22,6 +22,7 @@ import { FreshProductsService } from '../../services/fresh-products.service';
 import { FreshProductsModel } from '../../models/fresh-products.model';
 import { map } from 'rxjs/operators';
 import { FiltersFreshProductsQueryModel } from '../../query-models/filters-fresh-products.query-model';
+import { StarsFilterDataQueryModel } from '../../query-models/stars-filter-data.query-model';
 
 @Component({
   selector: 'app-categories-details',
@@ -65,11 +66,12 @@ export class CategoriesDetailsComponent {
   readonly filtersForm: FormGroup = new FormGroup({
     priceFrom: new FormControl(),
     priceTo: new FormControl(),
+    minRatingValue: new FormControl(),
   });
 
   readonly filters$: Observable<FiltersFreshProductsQueryModel> =
     this.filtersForm.valueChanges.pipe(
-      startWith({ priceFrom: 0, priceTo: 100000 })
+      startWith({ priceFrom: 0, priceTo: 100000, minRatingValue: 0 })
     );
 
   readonly currentPageCategoryName$: Observable<string> = combineLatest([
@@ -98,6 +100,10 @@ export class CategoriesDetailsComponent {
           }
           if (filters.priceTo) {
             decider = decider && freshProduct.price <= filters.priceTo;
+          }
+          if (filters.minRatingValue) {
+            decider =
+              decider && freshProduct.rating.value >= filters.minRatingValue;
           }
           return decider;
         });
@@ -128,6 +134,13 @@ export class CategoriesDetailsComponent {
         .map((freshProduct, i) => i + 1);
     })
   );
+
+  readonly starFiltersData$: Observable<StarsFilterDataQueryModel[]> = of([
+    { minValue: 5, stars: [1, 1, 1, 1, 1] },
+    { minValue: 4, stars: [1, 1, 1, 1, 0] },
+    { minValue: 3, stars: [1, 1, 1, 0, 0] },
+    { minValue: 2, stars: [1, 1, 0, 0, 0] },
+  ]);
 
   constructor(
     private _categoriesStorage: InMemoryCategoriesStorage,
