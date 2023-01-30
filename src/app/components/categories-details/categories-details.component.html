@@ -31,7 +31,7 @@
           formControlName="priceTo"
           placeholder="Price To"
         />
-        <p class="fs-5 mb-0 mt-7">Rating</p>
+        <p class="fs-5 mb-0 mt-7 mb-2">Rating</p>
         <div
           *ngFor="let item of starFiltersData$ | async"
           class="form-check mb-2"
@@ -41,7 +41,7 @@
             [value]="item.minValue"
             class="form-check-input"
             type="radio"
-            name="item"
+            name="minRatingValue"
             formControlName="minRatingValue"
           /><small class="text-warning">
             <i
@@ -54,6 +54,17 @@
               }"
             ></i>
           </small>
+        </div>
+
+        <p class="fs-5 mb-0 mt-7 mb-2">Stores</p>
+        <div *ngFor="let item of stores$ | async" class="form-check mb-2">
+          <input
+            [id]="item.id"
+            class="form-check-input"
+            [value]="item.id"
+            type="checkbox"
+            (change)="onCheckboxChange(item.id)"
+          /><label class="form-check-label">{{ item.name }}</label>
         </div>
       </form>
     </div>
