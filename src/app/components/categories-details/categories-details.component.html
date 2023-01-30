@@ -17,6 +17,21 @@
           /></a>
         </li>
       </ul>
+      <p class="fs-5 mt-5 mb-0">Price</p>
+      <form [formGroup]="filtersForm">
+        <input
+          type="number"
+          class="form-control my-3"
+          formControlName="priceFrom"
+          placeholder="Price From"
+        />
+        <input
+          type="number"
+          class="form-control my-3"
+          formControlName="priceTo"
+          placeholder="Price To"
+        />
+      </form>
     </div>
     <section class="col-12 col-md-9">
       <div class="card bg-light w-100">

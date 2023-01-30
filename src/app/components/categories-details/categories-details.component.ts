@@ -3,24 +3,25 @@ import {
   Component,
   ViewEncapsulation,
 } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   Observable,
   combineLatest,
-  shareReplay,
   of,
+  shareReplay,
   startWith,
   take,
   tap,
 } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { SortOrderQueryModel } from '../../query-models/sort-order.query-model';
 import { CategoryModel } from '../../models/category.model';
-import { FreshProductsModel } from '../../models/fresh-products.model';
+import { FreshProductsDetailedQueryModel } from '../../query-models/fresh-products-detailed.query-model';
 import { InMemoryCategoriesStorage } from '../../storages/categories/in-memory-categories.storage';
 import { FreshProductsService } from '../../services/fresh-products.service';
-import { FreshProductsDetailedQueryModel } from '../../query-models/fresh-products-detailed.query-model';
-import { FormControl } from '@angular/forms';
-import { SortOrderQueryModel } from '../../query-models/sort-order.query-model';
+import { FreshProductsModel } from '../../models/fresh-products.model';
+import { map } from 'rxjs/operators';
+import { FiltersFreshProductsQueryModel } from '../../query-models/filters-fresh-products.query-model';
 
 @Component({
   selector: 'app-categories-details',
@@ -61,6 +62,16 @@ export class CategoriesDetailsComponent {
     map((categories) => categories.map((category) => category.name))
   );
 
+  readonly filtersForm: FormGroup = new FormGroup({
+    priceFrom: new FormControl(),
+    priceTo: new FormControl(),
+  });
+
+  readonly filters$: Observable<FiltersFreshProductsQueryModel> =
+    this.filtersForm.valueChanges.pipe(
+      startWith({ priceFrom: 0, priceTo: 100000 })
+    );
+
   readonly currentPageCategoryName$: Observable<string> = combineLatest([
     this.categories$,
     this.categoryId$,
@@ -74,12 +85,22 @@ export class CategoriesDetailsComponent {
       this._freshProductsService.getAll(),
       this.categoryId$,
       this.sort$,
+      this.filters$,
     ]).pipe(
-      map(([freshProducts, categoryId, sortOption]) => {
+      map(([freshProducts, categoryId, sortOption, filters]) => {
         const freshProductsdetails = this._filterByCategoryIdAndMapToFPQuery(
           freshProducts,
           categoryId
-        );
+        ).filter((freshProduct) => {
+          let decider: boolean = true;
+          if (filters.priceFrom) {
+            decider = decider && freshProduct.price >= filters.priceFrom;
+          }
+          if (filters.priceTo) {
+            decider = decider && freshProduct.price <= filters.priceTo;
+          }
+          return decider;
+        });
         return this._sort(freshProductsdetails, sortOption);
       }),
       shareReplay(1)
