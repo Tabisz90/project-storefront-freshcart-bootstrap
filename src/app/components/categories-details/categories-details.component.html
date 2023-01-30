@@ -17,7 +17,7 @@
           /></a>
         </li>
       </ul>
-      <p class="fs-5 mt-5 mb-0">Price</p>
+      <p class="fs-5 mb-0 mt-7">Price</p>
       <form [formGroup]="filtersForm">
         <input
           type="number"
@@ -31,6 +31,7 @@
           formControlName="priceTo"
           placeholder="Price To"
         />
+        <p class="fs-5 mb-0 mt-7">Rating</p>
         <div
           *ngFor="let item of starFiltersData$ | async"
           class="form-check mb-2"
