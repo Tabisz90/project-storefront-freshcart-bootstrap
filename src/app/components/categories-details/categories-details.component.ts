@@ -22,6 +22,9 @@ import { FreshProductsService } from '../../services/fresh-products.service';
 import { FreshProductsModel } from '../../models/fresh-products.model';
 import { map } from 'rxjs/operators';
 import { FiltersFreshProductsQueryModel } from '../../query-models/filters-fresh-products.query-model';
+import { StarsFilterDataQueryModel } from '../../query-models/stars-filter-data.query-model';
+import { InMemoryStoresStorage } from '../../storages/stores/in-memory-stores.storage';
+import { StoreFilterQueryModel } from '../../query-models/store-filter.query-model';
 
 @Component({
   selector: 'app-categories-details',
@@ -30,10 +33,19 @@ import { FiltersFreshProductsQueryModel } from '../../query-models/filters-fresh
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoriesDetailsComponent {
+  readonly stores$: Observable<StoreFilterQueryModel[]> = this._storesStorage
+    .select()
+    .pipe(
+      map((stores) =>
+        stores.map((store) => ({ id: store.id, name: store.name }))
+      )
+    );
+
   readonly sortForm: FormControl = new FormControl('featureValueDesc');
   readonly sort$: Observable<string> = this.sortForm.valueChanges.pipe(
     startWith('featureValueDesc')
   );
+
   readonly sortOptions$: Observable<SortOrderQueryModel[]> = of([
     { name: 'Featured', value: 'featureValueDesc' },
     { name: 'Price: Low to High', value: 'priceAsc' },
@@ -52,6 +64,7 @@ export class CategoriesDetailsComponent {
       startWith({ pageNumber: 1, pageSize: 5 }),
       shareReplay(1)
     );
+
   readonly categoryId$: Observable<string> = this._activatedRoute.params.pipe(
     map((params) => params['categoryId'])
   );
@@ -65,12 +78,19 @@ export class CategoriesDetailsComponent {
   readonly filtersForm: FormGroup = new FormGroup({
     priceFrom: new FormControl(),
     priceTo: new FormControl(),
+    minRatingValue: new FormControl(),
+    storeIds: new FormControl(),
   });
 
-  readonly filters$: Observable<FiltersFreshProductsQueryModel> =
-    this.filtersForm.valueChanges.pipe(
-      startWith({ priceFrom: 0, priceTo: 100000 })
-    );
+  readonly filters$: Observable<any> = this.filtersForm.valueChanges.pipe(
+    startWith({
+      priceFrom: 0,
+      priceTo: 100000,
+      minRatingValue: 0,
+      storeIds: [],
+    }),
+    shareReplay(1)
+  );
 
   readonly currentPageCategoryName$: Observable<string> = combineLatest([
     this.categories$,
@@ -98,6 +118,17 @@ export class CategoriesDetailsComponent {
           }
           if (filters.priceTo) {
             decider = decider && freshProduct.price <= filters.priceTo;
+          }
+          if (filters.minRatingValue) {
+            decider =
+              decider && freshProduct.rating.value >= filters.minRatingValue;
+          }
+          if (filters.storeIds.length > 0 && freshProduct.storeIds.length > 0) {
+            decider =
+              decider &&
+              filters.storeIds.some((id: string) =>
+                freshProduct.storeIds.some((storeId) => storeId === id)
+              );
           }
           return decider;
         });
@@ -129,8 +160,16 @@ export class CategoriesDetailsComponent {
     })
   );
 
+  readonly starFiltersData$: Observable<StarsFilterDataQueryModel[]> = of([
+    { minValue: 5, stars: [1, 1, 1, 1, 1] },
+    { minValue: 4, stars: [1, 1, 1, 1, 0] },
+    { minValue: 3, stars: [1, 1, 1, 0, 0] },
+    { minValue: 2, stars: [1, 1, 0, 0, 0] },
+  ]);
+
   constructor(
     private _categoriesStorage: InMemoryCategoriesStorage,
+    private _storesStorage: InMemoryStoresStorage,
     private _activatedRoute: ActivatedRoute,
     private _freshProductsService: FreshProductsService,
     private _router: Router
@@ -171,6 +210,24 @@ export class CategoriesDetailsComponent {
       .subscribe();
   }
 
+  onCheckboxChange(storeId: string) {
+    let finalStoreIds: string[];
+    this.filters$
+      .pipe(
+        take(1),
+        tap((filters: FiltersFreshProductsQueryModel) => {
+          const storeIndex = filters.storeIds.indexOf(storeId);
+          finalStoreIds = filters.storeIds;
+          filters.storeIds.some((id) => id === storeId)
+            ? finalStoreIds.splice(storeIndex, 1)
+            : (finalStoreIds = [...filters.storeIds, storeId]);
+          this.filtersForm.setValue({ ...filters, storeIds: finalStoreIds });
+        }),
+        take(1)
+      )
+      .subscribe();
+  }
+
   private _findCategoryNameById(
     categoryId: string,
     categories: CategoryModel[]
@@ -193,6 +250,7 @@ export class CategoriesDetailsComponent {
             imageUrl: c.imageUrl.slice(1),
             price: c.price,
             featureValue: c.featureValue,
+            storeIds: c.storeIds,
             rating: {
               value: c.ratingValue,
               starsValues: this._makeStarsValues(c.ratingValue),
