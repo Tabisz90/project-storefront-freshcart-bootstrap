@@ -127,7 +127,7 @@ export class CategoriesDetailsComponent {
     ]).pipe(
       map(
         ([freshProducts, categoryId, sortOption, filters, storeSearchIds]) => {
-          const freshProductsdetails = this._filterByCategoryIdAndMapToFPQuery(
+          const freshProductsDetails = this._filterByCategoryIdAndMapToFPQuery(
             freshProducts,
             categoryId
           )
@@ -150,13 +150,13 @@ export class CategoriesDetailsComponent {
                 : true
             )
             .filter((freshProduct) =>
-              freshProduct.storeIds?.length > 0
+              freshProduct.storeIds?.length > 0 && filters.storeIds.length > 0
                 ? filters.storeIds?.some((id: string) =>
                     freshProduct.storeIds?.some((storeId) => storeId === id)
                   )
                 : true
             );
-          return this._sort(freshProductsdetails, sortOption);
+          return this._sort(freshProductsDetails, sortOption);
         }
       ),
       shareReplay(1)
