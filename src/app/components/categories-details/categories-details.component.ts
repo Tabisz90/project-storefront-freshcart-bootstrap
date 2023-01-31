@@ -130,37 +130,32 @@ export class CategoriesDetailsComponent {
           const freshProductsdetails = this._filterByCategoryIdAndMapToFPQuery(
             freshProducts,
             categoryId
-          ).filter((freshProduct) => {
-            let decider: boolean = true;
-            if (filters.priceFrom) {
-              decider = decider && freshProduct.price >= filters.priceFrom;
-            }
-            if (filters.priceTo) {
-              decider = decider && freshProduct.price <= filters.priceTo;
-            }
-            if (filters.minRatingValue) {
-              decider =
-                decider && freshProduct.rating.value >= filters.minRatingValue;
-            }
-            if (
-              filters.storeIds.length > 0 &&
-              freshProduct.storeIds.length > 0
-            ) {
-              decider =
-                decider &&
-                filters.storeIds.some((id: string) =>
-                  freshProduct.storeIds.some((storeId) => storeId === id)
-                );
-            }
-            if (storeSearchIds?.length > 0) {
-              decider =
-                decider &&
-                storeSearchIds.some((id: string) =>
-                  freshProduct.storeIds.some((storeId) => storeId === id)
-                );
-            }
-            return decider;
-          });
+          )
+            .filter((freshProduct) =>
+              filters.priceFrom ? freshProduct.price >= filters.priceFrom : true
+            )
+            .filter((freshProduct) =>
+              filters.priceTo ? freshProduct.price <= filters.priceTo : true
+            )
+            .filter((freshProduct) =>
+              filters.minRatingValue
+                ? freshProduct.rating.value >= filters.minRatingValue
+                : true
+            )
+            .filter((freshProduct) =>
+              storeSearchIds?.length > 0
+                ? storeSearchIds?.some((id: string) =>
+                    freshProduct.storeIds?.some((storeId) => storeId === id)
+                  )
+                : true
+            )
+            .filter((freshProduct) =>
+              freshProduct.storeIds?.length > 0
+                ? filters.storeIds?.some((id: string) =>
+                    freshProduct.storeIds?.some((storeId) => storeId === id)
+                  )
+                : true
+            );
           return this._sort(freshProductsdetails, sortOption);
         }
       ),
