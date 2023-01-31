@@ -25,6 +25,7 @@ import { FiltersFreshProductsQueryModel } from '../../query-models/filters-fresh
 import { StarsFilterDataQueryModel } from '../../query-models/stars-filter-data.query-model';
 import { InMemoryStoresStorage } from '../../storages/stores/in-memory-stores.storage';
 import { StoreFilterQueryModel } from '../../query-models/store-filter.query-model';
+import { LocalBasketStorage } from '../../storages/basket/local-basket.storage';
 
 @Component({
   selector: 'app-categories-details',
@@ -46,6 +47,8 @@ export class CategoriesDetailsComponent {
   readonly sort$: Observable<string> = this.sortForm.valueChanges.pipe(
     startWith('featureValueDesc')
   );
+
+  readonly basket$: Observable<string[]> = this._basketStorage.select();
 
   readonly sortOptions$: Observable<SortOrderQueryModel[]> = of([
     { name: 'Featured', value: 'featureValueDesc' },
@@ -195,6 +198,7 @@ export class CategoriesDetailsComponent {
   constructor(
     private _categoriesStorage: InMemoryCategoriesStorage,
     private _storesStorage: InMemoryStoresStorage,
+    private _basketStorage: LocalBasketStorage,
     private _activatedRoute: ActivatedRoute,
     private _freshProductsService: FreshProductsService,
     private _router: Router
@@ -252,6 +256,17 @@ export class CategoriesDetailsComponent {
       .subscribe();
   }
 
+  addToBasket(freshProduct: FreshProductsDetailedQueryModel): void {
+    this.basket$
+      .pipe(
+        take(1),
+        tap((products) =>
+          this._basketStorage.set([...products, freshProduct.id])
+        )
+      )
+      .subscribe();
+  }
+
   private _findCategoryNameById(
     categoryId: string,
     categories: CategoryModel[]
@@ -270,6 +285,7 @@ export class CategoriesDetailsComponent {
         return [
           ...acc,
           {
+            id: c.id,
             name: c.name,
             imageUrl: c.imageUrl.slice(1),
             price: c.price,
