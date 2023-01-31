@@ -252,8 +252,7 @@ export class CategoriesDetailsComponent {
             ? finalStoreIds.splice(storeIndex, 1)
             : (finalStoreIds = [...filters.storeIds, storeId]);
           this.filtersForm.setValue({ ...filters, storeIds: finalStoreIds });
-        }),
-        take(1)
+        })
       )
       .subscribe();
   }
