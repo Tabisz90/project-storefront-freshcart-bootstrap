@@ -36,27 +36,27 @@ export class ProductsInBasketComponent {
     freshProducts: FreshProductsModel[],
     productIds: string[]
   ): FreshProductsDetailedQueryModel[] {
-    return freshProducts.reduce((acc, c) => {
-      if (productIds.find((id) => id === c.id)) {
-        return [
-          ...acc,
-          {
-            id: c.id,
-            name: c.name,
-            imageUrl: c.imageUrl.slice(1),
-            price: c.price,
-            featureValue: c.featureValue,
-            storeIds: c.storeIds,
-            rating: {
-              value: c.ratingValue,
-              starsValues: this._makeStarsValues(c.ratingValue),
-              ratingCount: c.ratingCount,
-            },
-          },
-        ];
-      }
-      return [...acc];
-    }, [] as FreshProductsDetailedQueryModel[]);
+    const productsMap: Record<string, FreshProductsModel> =
+      freshProducts.reduce((acc, c) => {
+        return { ...acc, [c.id]: c };
+      }, {});
+
+    return productIds.map((id) => {
+      const product = productsMap[id];
+      return {
+        id: product.id,
+        name: product.name,
+        imageUrl: product.imageUrl.slice(1),
+        price: product.price,
+        featureValue: product.featureValue,
+        storeIds: product.storeIds,
+        rating: {
+          value: product.ratingValue,
+          starsValues: this._makeStarsValues(product.ratingValue),
+          ratingCount: product.ratingCount,
+        },
+      };
+    });
   }
 
   private _makeStarsValues(value: number): number[] {
